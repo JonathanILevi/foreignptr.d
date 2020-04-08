@@ -1,0 +1,9 @@
+name	"foreignptr"
+description	"A foreign ptr wrapper with automatic cleanup callback."
+authors	"Jonathan Levi"
+copyright	"Copyright © 2018, Jonathan Levi"
+license	"CC0"
+
+target	"library"
+targetPath	"build"
+
