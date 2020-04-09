@@ -16,9 +16,19 @@ class CTForeignPtr(alias deconstruct, T) : ForeignPtr!T {
 	}
 }
 private
-class RTForeignPtr(T) : ForeignPtr!T {
+class RTDForeignPtr(T) : ForeignPtr!T {
 	 void delegate(T) __deconstruct;
-	this(T ptr, void delegate(T) deconstruct;) {
+	this(T ptr, void delegate(T) deconstruct) {
+		this.__foreignPtr = ptr;
+		this.__deconstruct = __deconstruct;
+	}
+	~this() {
+		this.__deconstruct(__foreignPtr);
+	}
+}
+class RTFForeignPtr(T) : ForeignPtr!T {
+	 void function(T) __deconstruct;
+	this(T ptr, void function(T) deconstruct) {
 		this.__foreignPtr = ptr;
 		this.__deconstruct = __deconstruct;
 	}
@@ -31,20 +41,23 @@ ForeignPtr!T foreignPtr(alias deconstruct, T)(T ptr) {
 	return new CTForeignPtr!(deconstruct, T)(ptr);
 }
 
-ForeignPtr!T foreignPtr(T)(T ptr, void delegate(T) deconstruct) {
-	return new RTForeignPtr!T(ptr, deconstruct);
-} 
 ForeignPtr!T foreignPtr(T)(void delegate(T) deconstruct, T ptr) {
-	return new RTForeignPtr!T(ptr, deconstruct);
+	return new RTDForeignPtr!T(ptr, deconstruct);
 } 
-ForeignPtr!T
-delegate(void delegate(T))
-foreignPtr(T)(T ptr) {
-	return deconstruct => new RTForeignPtr!T(ptr, deconstruct);
+ForeignPtr!T foreignPtr(T)(void function(T) deconstruct, T ptr) {
+	return new RTFForeignPtr!T(ptr, deconstruct);
 } 
-ForeignPtr!T
-delegate(T)
-foreignPtr(T)(void delegate(T) deconstruct) {
-	return ptr => new NewForeignPtr(ptr, deconstruct);
-} 
+////ForeignPtr!T foreignPtr(T)(T ptr, void delegate(T) deconstruct) {
+////	return new RTForeignPtr!T(ptr, deconstruct);
+////} 
+////ForeignPtr!T
+////delegate(void delegate(T))
+////foreignPtr(T)(T ptr) {
+////	return deconstruct => new RTForeignPtr!T(ptr, deconstruct);
+////} 
+////ForeignPtr!T
+////delegate(T)
+////foreignPtr(T)(void delegate(T) deconstruct) {
+////	return ptr => new NewForeignPtr(ptr, deconstruct);
+////} 
 
